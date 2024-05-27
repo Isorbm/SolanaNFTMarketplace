@@ -1,0 +1,9 @@
+[package]
+name = "solana_nft_marketplace"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+solana-program = "1.7.10"
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1.0"
