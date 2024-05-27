@@ -1,1 +1,1 @@
-# SolanaNFTMarketplace
+SolanaNFTMarketplace is a Node.js-based backend application designed to power an NFT marketplace on the Solana blockchain. This project allows for the integration and management of NFT assets, providing functionalities such as listing, trading, and viewing NFTs. Built with Express, it leverages Solana's fast and efficient blockchain network to offer a seamless and user-friendly experience for both sellers and buyers in the digital collectible space.
