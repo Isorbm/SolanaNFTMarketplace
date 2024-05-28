@@ -1,15 +1,22 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const morgan = require('morgan');
+const logger = require('morgan');
 const nftRoutes = require('./routes/nft');
+
 dotenv.config();
-const app = express();
-app.use(cors());
-app.use(morgan('dev'));
-app.use(express.json());
-app.use('/api/nft', nftRoutes);
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+
+const server = express();
+
+server.use(cors());
+server.use(logger('dev'));
+server.use(express.json());
+
+server.use('/api/nft', nftRoutes);
+
+const DEFAULT_PORT = 5000;
+const port = process.env.PORT || DEFAULT_PORT;
+
+server.listen(port, () => {
+    console.log(`NFT Marketplace API running on port ${port}`);
 });
