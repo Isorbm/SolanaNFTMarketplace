@@ -8,6 +8,16 @@ dotenv.config();
 
 const server = express();
 
+// Middleware to log details of each request
+const detailedLogger = (req, res, next) => {
+    const currentTime = new Date().toISOString();
+    console.log(`[${currentTime}] Incoming request: ${req.method} ${req.path}`);
+    next(); // Continue to next middleware or route handler
+};
+
+// Use the custom detailedLogger middleware
+server.use(detailedLogger);
+
 server.use(cors());
 server.use(logger('dev'));
 server.use(express.json());
