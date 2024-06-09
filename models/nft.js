@@ -1,21 +1,39 @@
-const NodeCache = require( "node-cache" );
+const NodeScope = require("node-cache");
 const myCache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
 
-// Fake API call function
+const logError = (error) => {
+    console.error("Error encountered:", error);
+};
+
 async function fetchNFTMetadata(tokenId) {
-    // Assume this function fetches metadata from an external API
+    try {
+        return { tokenId: tokenId, metadata: "Sample NFT Metadata" };
+    } catch (error) {
+        logError(error);
+        throw error;
+    }
 }
 
-// Enhanced function with caching
 async function getNFTMetadata(tokenId) {
-    const cacheKey = `nftMetadata_${tokenId}`;
-    const cachedData = myCache.get(cacheKey);
+    try {
+        const cacheKey = `nftMetadata_${tokenId}`;
+        const cachedData = myCache.get(cacheKey);
 
-    if (cachedData) {
-        return cachedData;
-    } else {
-        const metadata = await fetchNFTMetadata(tokenId);
-        myCache.set(cacheKey, metadata);
-        return metadata;
+        if (cachedData) {
+            console.log("Retrieved from cache:", cacheKey);
+            return cachedData;
+        } else {
+            const metadata = await fetchNFTMetadata(tokenId);
+            const cacheSuccess = myCache.set(cacheKey, metadata);
+
+            if (!cacheSuccess) {
+                logError(`Failed to cache data for token ID: ${tokenId}`);
+            }
+
+            return metadata;
+        }
+    } catch (error) {
+        logError(error);
+        throw new Error(`Failed to retrieve NFT metadata for token ID: ${tokenId}`);
     }
 }
