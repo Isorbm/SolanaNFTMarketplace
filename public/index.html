@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Env Example</title>
+    <script>
+        const API_KEY = window.envVariables ? window.envVariables.API_KEY : 'default_key';
+        const API_URL = window.envVariables ? window.envVariables.API_URL : 'https://your-api-url.com';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log(`Using API Key: ${API_KEY}`);
+            console.log(`Hitting API URL: ${API_URL}`);
+        });
+    </script>
+</head>
+<body>
+    <h1>Using Environment Variables</h1>
+</body>
+</html>
