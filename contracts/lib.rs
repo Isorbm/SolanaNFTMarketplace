@@ -35,30 +35,30 @@ pub fn process_instruction(
         .map_err(|_| ProgramError::InvalidInstructionData)?;
 
     match instruction {
-        MarketplaceInstruction::List { price } => process_list(accounts, price, program_id),
-        MarketplaceInstruction::Purchase => process_purchase(accounts, program_id),
+        MarketplaceInstruction::List { price } => execute_listing(accounts, price, program_id),
+        MarketplaceInstruction::Purchase => execute_purchase(accounts, program_id),
     }
 }
 
-fn process_list(accounts: &[AccountInfo], price: u64, _program_id: &Pubkey) -> ProgramResult {
-    let accounts_iter = &mut accounts.iter();
+fn execute_listing(accounts: &[AccountInfo], price: u64, _program_id: &Pubkey) -> ProgramResult {
+    let mut accounts_iter = accounts.iter();
 
-    let seller_account = next_account_info(accounts_iter)?;
+    let seller_account_info = next_account_info(&mut accounts_iter)?;
 
     let state = MarketplaceState::Listed { price };
-    state.serialize(&mut &mut seller_account.data.borrow_mut()[..])?;
+    state.serialize(&mut &mut seller_account_info.data.borrow_mut()[..])?;
 
     Ok(())
 }
 
-fn process_purchase(accounts: &[AccountInfo], _program_id: &Pubkey) -> ProgramResult {
-    let accounts_iter = &mut accounts.iter();
+fn execute_purchase(accounts: &[AccountInfo], _program_id: &Pubkey) -> ProgramResult {
+    let mut accounts_iter = accounts.iter();
 
-    let buyer_account = next_account_info(accounts_iter)?;
-    let seller_account = next_account_include(accounts_iter)?;
+    let buyer_account_info = next_account_info(&mut accounts_iter)?;
+    let seller_account_info = next_account_info(&mut accounts_iter)?;
 
     let state = MarketplaceState::Sold;
-    state.serialize(&mut &mut seller_area.data.borrow_mut()[..])?;
+    state.serialize(&mut &mut seller_account_info.data.borrow_mut()[..])?;
 
     Ok(())
 }
