@@ -3,8 +3,8 @@ use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint,
     entrypoint::ProgramResult,
-    pubkey::Pubkey,
     program_error::ProgramError,
+    pubkey::Pubkey,
 };
 
 entrypoint!(process_instruction);
@@ -45,8 +45,9 @@ fn execute_listing(accounts: &[AccountInfo], price: u64, _program_id: &Pubkey) -
 
     let seller_account_info = next_account_info(&mut accounts_iter)?;
 
+    let mut data = seller_account_info.data.borrow_mut();
     let state = MarketplaceState::Listed { price };
-    state.serialize(&mut &mut seller_account_info.data.borrow_mut()[..])?;
+    state.serialize(&mut *data)?;
 
     Ok(())
 }
@@ -57,8 +58,9 @@ fn execute_purchase(accounts: &[AccountInfo], _program_id: &Pubkey) -> ProgramRe
     let buyer_account_info = next_account_info(&mut accounts_iter)?;
     let seller_account_info = next_account_info(&mut accounts_iter)?;
 
+    let mut data = seller_account_info.data.borrow_mut();
     let state = MarketplaceState::Sold;
-    state.serialize(&mut &mut seller_account_info.data.borrow_mut()[..])?;
+    state.serialize(&mut *data)?;
 
     Ok(())
 }
