@@ -8,30 +8,32 @@ use solana_program::{
 };
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
-pub enum NFTInstruction {
-    MintNFT {
+pub enum NFTMarketplaceInstruction {
+    CreateNFT {
         metadata: Vec<u8>,
     },
-    BuyNFT {
-        price: u64,
+    PurchaseNFT {
+        offered_price: u64,
     },
 }
 
-pub fn process_instruction(
+pub fn handle_instruction(
     program_id: &Pubkey,
-    accounts: &[Account|nfo],
-    instruction_data: &[u8],
+    accounts: &[AccountInfo],
+    instruction_bytes: &[u8],
 ) -> ProgramResult {
-    let instruction = NFTInstruction::try_from_slice(instruction_data)
+    let marketplace_instruction = NFTMarketplaceInstruction::try_from_slice(instruction_bytes)
         .map_err(|_| ProgramError::InvalidInstructionData)?;
     
-    match instruction {
-        NFTInstruction::MintNFT { metadata } => {
-            msg!("Instruction: MintNFT");
+    match marketplace_instruction {
+        NFTMarketplaceInstruction::CreateNFT { metadata } => {
+            msg!("Marketplace Instruction: CreateNFT");
+            // Implementation for minting NFT goes here.
             Ok(())
         }
-        NFTInstruction::BuyNFT { price } => {
-            msg!("Instruction: BuyNFT");
+        NFTMarketplaceInstruction::PurchaseNFT { offered_price } => {
+            msg!("Marketplace Instruction: PurchaseNFT");
+            // Implementation for buying NFT goes here.
             Ok(())
         }
     }
