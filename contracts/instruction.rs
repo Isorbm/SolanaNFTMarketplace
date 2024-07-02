@@ -15,6 +15,15 @@ pub enum NFTMarketplaceInstruction {
     PurchaseNFT {
         offered_price: u64,
     },
+    ListNFTForSale {
+        price: u64,
+    },
+    UpdateNFTMetadata {
+        new_metadata: Vec<u8>,
+    },
+    TransferNFTOwnership {
+        new_owner: Pubkey,
+    },
 }
 
 pub fn handle_instruction(
@@ -28,12 +37,22 @@ pub fn handle_instruction(
     match marketplace_instruction {
         NFTMarketplaceInstruction::CreateNFT { metadata } => {
             msg!("Marketplace Instruction: CreateNFT");
-            // Implementation for minting NFT goes here.
             Ok(())
         }
         NFTMarketplaceInstruction::PurchaseNFT { offered_price } => {
             msg!("Marketplace Instruction: PurchaseNFT");
-            // Implementation for buying NFT goes here.
+            Ok(())
+        }
+        NFTMarketshipInstruction::ListNFTForSale { price } => {
+            msg!("Market Instruction: ListNFTForSale with price: {}", price);
+            Ok(())
+        }
+        NFTMarketplaceInstruction::UpdateNFTMetadata { new_metadata } => {
+            msg!("Marketplace Instruction: UpdateNFTMetadata");
+            Ok(())
+        }
+        NFTMarketplaceInstruction::TransferNFTOwnership { new_owner } => {
+            msg!("Marketplace Instruction: TransferNFTOwnership");
             Ok(())
         }
     }
