@@ -1,28 +1,29 @@
-use solana_program::{
-    program_error::ProgramError,
-    decode_error::DecodeError,
-    program_pack::{IsInitialized, Pack, Sealed},
-};
-use thiserror::Error;
+use std::collections::HashMap;
+use std::sync::Mutex;
 
-#[derive(Clone, Debug, Eq, Error, PartialEq)]
-pub enum MyContractError {
-    #[error("Example Error")]
-    ExampleError,
-    #[error("Unauthorized")]
-    Unauthorized,
-    #[error("Invalid Instruction")]
-    InvalidInstruction,
+lazy_static::lazy_static! {
+    static ref CACHE: Mutex<HashMap<String, u32>> = Mutex::new(HashMap::new());
 }
 
-impl From<MyContractError> for ProgramError {
-    fn from(e: MyContractError) -> Self {
-        ProgramError::Custom(e as u32)
+fn expensive_calculation(arg: &str) -> u32 {
+    println!("Calculating for {}", arg);
+    arg.len() as u32
+}
+
+fn cached_expensive_calculation(arg: &str) -> u32 {
+    let mut cache = CACHE.lock().unwrap();
+    
+    match cache.get(arg) {
+        Some(result) => *result,
+        None => {
+            let result = expensive_calculation(arg);
+            cache.insert(arg.to_string(), result);
+            result
+        },
     }
 }
 
-impl<T> DecodeError<T> for MyContractError {
-    fn type_of() -> &'static str {
-        "MyContractError"
-    }
+fn main() {
+    println!("{}", cached_expensive_calculation("test"));
+    println!("{}", cached_expensive_calculation("test"));
 }
