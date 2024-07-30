@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection } from '@solana/web3.js';
 import { getNFTs, mintNFT, buyNFT } from './solana';
 import NFTList from './NFTList';
 import MintNFT from './MintNFT';
@@ -23,28 +23,31 @@ const MainComponent: React.FC = () => {
       console.error('Solana network URL is not defined in your .env file.');
       return;
     }
-    const newConnection = new Connection(solanaNetworkUrl, "confirmed");
-    setConnection(newConnection);
+    
+    const initializeConnection = new Connection(solanaNetworkUrl, "confirmed");
+    setConnection(initializeConnection);
 
-    const fetchNFTs = async () => {
-      if(!newConnection) return;
-      const fetchedNFTs = await getNFTs(newConnection);
+    const fetchAllNFTs = async () => {
+      if (!initializeConnection) return;
+      const fetchedNFTs = await getNFTs(initializeConnection);
       setNfts(fetchedNFTs);
     };
 
-    fetchNFTs();
+    fetchAllNFTs();
   }, []);
 
   const handleMint = async (nftData: { name: string; image: string; price: number }) => {
     if (!connection) return;
+    
     const mintedNFT = await mintNFT(connection, nftData);
     setNfts(prevNfts => [...prevNfts, mintedNFT]);
   };
 
   const handleBuy = async (nftId: string) => {
     if (!connection) return;
-    const updatedNFTs = await buyNFT(connection, nftId);
-    setNfts(updatedNFTs);
+    
+    const updatedNFTCollection = await buyNFT(connection, nftId);
+    setNfts(updatedNFTCollection);
   };
 
   return (
