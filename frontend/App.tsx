@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Connection } from '@solana/web3.js';
-import { getNFTs, mintNFT, buyNFT } from './solana';
-import NFTList from './NFTList';
-import MintNFT from './MintNFT';
-import BuyNFT from './BuyNFT';
+import { fetchNFTCollection, mintNewNFT, purchaseNFT } from './solana';
+import DisplayNFTs from './NFTList';
+import CreateNFT from './MintNFT';
+import InitiatePurchase from './BuyNFT';
 
-const solanaNetworkUrl = process.env.REACT_APP_SOLANA_NETWORK_URL;
+const solanaRPCUrl = process.env.REACT_APP_SOLANA_NETWORK_URL;
 
 interface NFT {
   id: string;
@@ -14,49 +14,49 @@ interface NFT {
   price: number;
 }
 
-const MainComponent: React.FC = () => {
-  const [nfts, setNfts] = useState<NFT[]>([]);
-  const [connection, setConnection] = useState<Connection | null>(null);
+const NFTMarketplace: React.FC = () => {
+  const [nftCollection, setNftCollection] = useState<NFT[]>([]);
+  const [solanaConnection, setSolanaConnection] = useState<Connection | null>(null);
 
   useEffect(() => {
-    if (!solanaNetworkUrl) {
-      console.error('Solana network URL is not defined in your .env file.');
+    if (!solanaRPCUrl) {
+      console.error('Solana network URL is not set in your .env file.');
       return;
     }
     
-    const initializeConnection = new Connection(solanaNetworkUrl, "confirmed");
-    setConnection(initializeConnection);
+    const newConnection = new Connection(solanaRPCUrl, "confirmed");
+    setSolanaConnection(newConnection);
 
-    const fetchAllNFTs = async () => {
-      if (!initializeConnection) return;
-      const fetchedNFTs = await getNFTs(initializeConnection);
-      setNfts(fetchedNFTs);
+    const loadNFTCollection = async () => {
+      if (!newConnection) return;
+      const nftGallery = await fetchNFTCollection(newConnection);
+      setNftCollection(nftGallery);
     };
 
-    fetchAllNFTs();
+    loadNFTCollection();
   }, []);
 
-  const handleMint = async (nftData: { name: string; image: string; price: number }) => {
-    if (!connection) return;
+  const handleNFTMinting = async (nftDetails: { name: string; image: string; price: number }) => {
+    if (!solanaConnection) return;
     
-    const mintedNFT = await mintNFT(connection, nftData);
-    setNfts(prevNfts => [...prevNfts, mintedNFT]);
+    const newNFT = await mintNewNFT(solanaConnection, nftDetails);
+    setNftCollection(existingNFTs => [...existingNFTs, newNFT]);
   };
 
-  const handleBuy = async (nftId: string) => {
-    if (!connection) return;
+  const handleNFTPurchase = async (nftPrimaryKey: string) => {
+    if (!solanaConnection) return;
     
-    const updatedNFTCollection = await buyNFT(connection, nftId);
-    setNfts(updatedNFTCollection);
+    const updatedNFTGallery = await purchaseNFT(solanaConnection, nftPrimaryKey);
+    setNftCollection(updatedNFTGallery);
   };
 
   return (
     <div>
-      <MintNFT onMint={handleMint} />
-      <NFTList nfts={nfts} />
-      <BuyNFT onBuy={handleBuy} />
+      <CreateNFT onMint={handleNFTMinting} />
+      <DisplayNFTs nfts={nftCollection} />
+      <InitiatePurchase onBuy={handleNFTPurchase} />
     </div>
   );
 };
 
-export default MainComponent;
+export default NFTMarketplace;
