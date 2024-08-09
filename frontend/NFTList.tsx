@@ -1,4 +1,5 @@
-import React from 'react';
+// NFTContext.tsx
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface NFT {
   id: number;
@@ -7,27 +8,48 @@ interface NFT {
   price: number;
 }
 
-interface NFTListProps {
+interface NFTContextType {
   nfts: NFT[];
+  fetchNFTs: () => void;
+  buyNFT: (id: number) => void;
 }
 
-const NFTList: React.FC<NFTListProps> = ({ nfts }) => {
-  const buyNFT = (id: number) => {
-    console.log(`Buying NFT with id ${id}`);
+const NFTContext = createContext<NFTContextType | undefined>(undefined);
+
+const NFTProvider: React.FC = ({ children }) => {
+  const [nfts, setNfts] = useState<NFT[]>([]);
+
+  const fetchNFTs = () => {
+      // Assuming a single fetch call gets all NFTs;
+      // Replace this with your actual data fetching logic
+      console.log("Fetching NFTs...");
+      // setNfts(fetchedNFTs);
   };
 
+  const buyNFT = (id: number) => {
+    console.log(`Buying NFT with id ${id}`);
+    // Here, you'd ideally do a batch operation or a single call per action,
+    // depending on your backend capability and the specific requirement.
+  };
+
+  useEffect(() => {
+    fetchNFTs();
+  }, []);
+
   return (
-    <ul>
-      {nfts.map((nft) => (
-        <li key={nft.id}>
-          <img src={nft.image} alt={nft.name} style={{ width: '100px', height: '100px' }} />
-          <h3>{nft.name}</h3>
-          <p>Price: {nft.price} ETH</p>
-          <button onClick={() => buyNFT(nft.id)}>Buy</button>
-        </li>
-      ))}
-    </ul>
+    <NFTContext.Provider value={{ nfts, fetchNFTs, buyNFT }}>
+      {children}
+    </NFTContext.Provider>
   );
 };
 
-export default NFTList;
+// Hook to use the NFT context
+const useNFTs = () => {
+  const context = useContext(NFTContext);
+  if (context === undefined) {
+    throw new Error('useNFTs must be used within a NFTProvider');
+  }
+  return context;
+};
+
+export { NFTProvider, useNFTs };
