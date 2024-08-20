@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
-
 interface MintNFTProps {
-  mintNFT: (name: string, description: string, image: File) => void;
+  mintNFT: (name: string, description: string, image: File) => Promise<void>;
 }
 
 const MintNFTComponent: React.FC<MintNFTProps> = ({ mintNFT }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null); // To display error messages
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -16,10 +16,19 @@ const MintNFTComponent: React.FC<MintNFTProps> = ({ mintNFT }) => {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (image) {
-      mintNFT(name, description, image);
+      try {
+        await mintNFT(name, description, image); // Assuming mintNFT is an async function
+        alert('NFT minted successfully!');
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred during NFT minting.');
+        }
+      }
     } else {
       alert('Please select an image for your NFT');
     }
@@ -55,6 +64,7 @@ const MintNFTComponent: React.FC<MintNFTProps> = ({ mintNFT }) => {
           required
         />
       </div>
+      {error && (<p style={{color: 'red'}}>Error: {error}</p>)}
       <button type="submit">Mint NFT</button>
     </form>
   );
